@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asset Management Dashboard</title>
+    <style>
+        body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f9f9f9;
+}
+
+header {
+    background-color: #4CAF50;
+    color: white;
+    text-align: center;
+    padding: 1rem 0;
+}
+
+main {
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.dashboard, .charts, .analytics {
+    display: flex;
+    justify-content: space-around;
+    width: 100%;
+    margin-bottom: 2rem;
+}
+
+.card {
+    background-color: white;
+    padding: 2rem;
+    margin: 1rem;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    flex: 1;
+    text-align: center;
+}
+
+.chart {
+    background-color: white;
+    padding: 2rem;
+    margin: 1rem;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    flex: 1;
+    max-width: 500px; /* Set a maximum width for the chart container */
+    height: 400px; /* Set a fixed height for the chart container */
+}
+
+.chart canvas {
+    width: 100% !important; /* Ensure the canvas takes full width of the container */
+    height: 100% !important; /* Ensure the canvas takes full height of the container */
+}
+
+h2 {
+    margin-top: 0;
+}
+
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Asset Management Dashboard</h1>
+    </header>
+    <main>
+        <section class="dashboard">
+            <div class="card">
+                <h2>Total Assets</h2>
+                <p id="totalAssets">0</p>
+            </div>
+            <div class="card">
+                <h2>Pending Requests</h2>
+                <p id="pendingRequests">0</p>
+            </div>
+            <div class="card">
+                <h2>Approved Requests</h2>
+                <p id="approvedRequests">0</p>
+            </div>
+            <div class="card">
+                <h2>Rejected Requests</h2>
+                <p id="rejectedRequests">0</p>
+            </div>
+        </section>
+        <section class="charts">
+            <div class="chart">
+                <h2>Asset Distribution</h2>
+                <canvas id="assetDistributionChart"></canvas>
+            </div>
+            <div class="chart">
+                <h2>Request Status</h2>
+                <canvas id="requestStatusChart"></canvas>
+            </div>
+        </section>
+        <section class="analytics">
+            <div class="chart">
+                <h2>Asset Value Over Time</h2>
+                <canvas id="assetValueChart"></canvas>
+            </div>
+            <div class="chart">
+                <h2>Asset Acquisition vs. Disposal</h2>
+                <canvas id="assetAcquisitionChart"></canvas>
+            </div>
+        </section>
+    </main>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+    const totalAssets = document.getElementById('totalAssets');
+    const pendingRequests = document.getElementById('pendingRequests');
+    const approvedRequests = document.getElementById('approvedRequests');
+    const rejectedRequests = document.getElementById('rejectedRequests');
+
+    // Sample data
+    const data = {
+        totalAssets: 100,
+        pendingRequests: 10,
+        approvedRequests: 50,
+        rejectedRequests: 5,
+        assetDistribution: {
+            labels: ['Buildings', 'Vehicles', 'Furniture', 'Equipment'],
+            values: [40, 10, 30, 20]
+        },
+        requestStatus: {
+            labels: ['Pending', 'Approved', 'Rejected'],
+            values: [10, 50, 5]
+        },
+        assetValueOverTime: {
+            labels: ['January', 'February', 'March', 'April', 'May', 'June'],
+            values: [10000, 15000, 13000, 17000, 16000, 18000]
+        },
+        assetAcquisitionDisposal: {
+            labels: ['January', 'February', 'March', 'April', 'May', 'June'],
+            acquisition: [5, 8, 6, 9, 7, 10],
+            disposal: [2, 3, 4, 1, 2, 3]
+        }
+    };
+
+    // Update dashboard
+    totalAssets.textContent = data.totalAssets;
+    pendingRequests.textContent = data.pendingRequests;
+    approvedRequests.textContent = data.approvedRequests;
+    rejectedRequests.textContent = data.rejectedRequests;
+
+    // Variables to hold chart instances
+    let assetDistributionChart;
+    let requestStatusChart;
+    let assetValueChart;
+    let assetAcquisitionChart;
+
+    // Function to create charts
+    function createCharts() {
+        const ctx1 = document.getElementById('assetDistributionChart').getContext('2d');
+        const ctx2 = document.getElementById('requestStatusChart').getContext('2d');
+        const ctx3 = document.getElementById('assetValueChart').getContext('2d');
+        const ctx4 = document.getElementById('assetAcquisitionChart').getContext('2d');
+
+        // Destroy previous chart instances if they exist
+        if (assetDistributionChart) {
+            assetDistributionChart.destroy();
+        }
+        if (requestStatusChart) {
+            requestStatusChart.destroy();
+        }
+        if (assetValueChart) {
+            assetValueChart.destroy();
+        }
+        if (assetAcquisitionChart) {
+            assetAcquisitionChart.destroy();
+        }
+
+        assetDistributionChart = new Chart(ctx1, {
+            type: 'doughnut',
+            data: {
+                labels: data.assetDistribution.labels,
+                datasets: [{
+                    data: data.assetDistribution.values,
+                    backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4CAF50']
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false
+            }
+        });
+
+        requestStatusChart = new Chart(ctx2, {
+            type: 'bar',
+            data: {
+                labels: data.requestStatus.labels,
+                datasets: [{
+                    data: data.requestStatus.values,
+                    backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56']
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        assetValueChart = new Chart(ctx3, {
+            type: 'line',
+            data: {
+                labels: data.assetValueOverTime.labels,
+                datasets: [{
+                    label: 'Asset Value',
+                    data: data.assetValueOverTime.values,
+                    borderColor: '#4CAF50',
+                    fill: false
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        assetAcquisitionChart = new Chart(ctx4, {
+            type: 'bar',
+            data: {
+                labels: data.assetAcquisitionDisposal.labels,
+                datasets: [
+                    {
+                        label: 'Acquisition',
+                        data: data.assetAcquisitionDisposal.acquisition,
+                        backgroundColor: '#36A2EB'
+                    },
+                    {
+                        label: 'Disposal',
+                        data: data.assetAcquisitionDisposal.disposal,
+                        backgroundColor: '#FF6384'
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    }
+
+    // Create charts initially
+    createCharts();
+});
+
+    </script>
+</body>
+</html>

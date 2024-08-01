@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asset Inventory</title>
+    <style>
+        body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f9f9f9;
+}
+
+header {
+    background-color: #4CAF50;
+    color: white;
+    text-align: center;
+    padding: 1rem 0;
+}
+
+main {
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.filter-section {
+    margin-bottom: 1rem;
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    max-width: 800px;
+}
+
+.filter-section input,
+.filter-section select {
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    margin-right: 1rem;
+    flex: 1;
+}
+
+table {
+    width: 100%;
+    max-width: 800px;
+    border-collapse: collapse;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    background-color: white;
+}
+
+th, td {
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+th {
+    cursor: pointer;
+    background-color: #f2f2f2;
+}
+
+tr:hover {
+    background-color: #f1f1f1;
+}
+
+th:after {
+    content: '\25b2';
+    display: inline-block;
+    margin-left: 5px;
+    font-size: 0.7em;
+    visibility: hidden;
+}
+
+th.sort-asc:after {
+    visibility: visible;
+    content: '\25b2';
+}
+
+th.sort-desc:after {
+    visibility: visible;
+    content: '\25bc';
+}
+
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Asset Inventory</h1>
+    </header>
+    <main>
+        <div class="filter-section">
+            <input type="text" id="searchInput" placeholder="Search assets...">
+            <select id="filterCondition">
+                <option value="">Filter by condition</option>
+                <option value="new">New</option>
+                <option value="good">Good</option>
+                <option value="fair">Fair</option>
+                <option value="poor">Poor</option>
+            </select>
+        </div>
+        <table id="assetTable">
+            <thead>
+                <tr>
+                    <th onclick="sortTable(0)">Asset ID</th>
+                    <th onclick="sortTable(1)">Description</th>
+                    <th onclick="sortTable(2)">Acquisition Date</th>
+                    <th onclick="sortTable(3)">Value</th>
+                    <th onclick="sortTable(4)">Location</th>
+                    <th onclick="sortTable(5)">Condition</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Sample data; replace with dynamic data -->
+                <tr>
+                    <td>001</td>
+                    <td>Projector</td>
+                    <td>2021-05-12</td>
+                    <td>$500</td>
+                    <td>Conference Room</td>
+                    <td>Good</td>
+                </tr>
+                <tr>
+                    <td>002</td>
+                    <td>Office Chair</td>
+                    <td>2022-01-15</td>
+                    <td>$150</td>
+                    <td>Main Office</td>
+                    <td>New</td>
+                </tr>
+                <!-- More rows here -->
+            </tbody>
+        </table>
+    </main>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('searchInput');
+    const filterCondition = document.getElementById('filterCondition');
+    const table = document.getElementById('assetTable');
+    const tbody = table.getElementsByTagName('tbody')[0];
+    const rows = Array.from(tbody.getElementsByTagName('tr'));
+
+    searchInput.addEventListener('input', filterTable);
+    filterCondition.addEventListener('change', filterTable);
+
+    function filterTable() {
+        const searchTerm = searchInput.value.toLowerCase();
+        const condition = filterCondition.value;
+
+        rows.forEach(row => {
+            const cells = row.getElementsByTagName('td');
+            const matchesSearch = cells[1].textContent.toLowerCase().includes(searchTerm);
+            const matchesCondition = !condition || cells[5].textContent.toLowerCase() === condition;
+
+            if (matchesSearch && matchesCondition) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    }
+
+    window.sortTable = function(columnIndex) {
+        const rowsArray = Array.from(rows);
+        const isAscending = table.rows[0].cells[columnIndex].classList.toggle('sort-asc');
+
+        table.querySelectorAll('th').forEach((th, i) => {
+            if (i !== columnIndex) th.classList.remove('sort-asc', 'sort-desc');
+        });
+
+        table.rows[0].cells[columnIndex].classList.toggle('sort-desc', !isAscending);
+
+        rowsArray.sort((a, b) => {
+            const cellA = a.cells[columnIndex].textContent.trim();
+            const cellB = b.cells[columnIndex].textContent.trim();
+
+            if (!isNaN(cellA) && !isNaN(cellB)) {
+                return isAscending ? cellA - cellB : cellB - cellA;
+            }
+
+            return isAscending ? cellA.localeCompare(cellB) : cellB.localeCompare(cellA);
+        });
+
+        rowsArray.forEach(row => tbody.appendChild(row));
+    };
+});
+
+    </script>
+</body>
+</html>

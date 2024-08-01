@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asset Maintenance and Repair</title>
+    <style>
+        body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f9f9f9;
+}
+
+header {
+    background-color: #4CAF50;
+    color: white;
+    text-align: center;
+    padding: 1rem 0;
+}
+
+main {
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+section {
+    background-color: white;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 5px;
+    padding: 1rem;
+    margin: 1rem;
+    width: 100%;
+    max-width: 800px;
+}
+
+h2 {
+    margin-top: 0;
+    font-size: 1.5rem;
+}
+
+.form-group {
+    margin-bottom: 1rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+}
+
+button {
+    background-color: #4CAF50;
+    color: white;
+    padding: 0.7rem 1.5rem;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 1rem;
+}
+
+button:hover {
+    background-color: #45a049;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+}
+
+th, td {
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+th {
+    background-color: #f2f2f2;
+}
+
+tr:hover {
+    background-color: #f1f1f1;
+}
+
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Asset Maintenance and Repair</h1>
+    </header>
+    <main>
+        <section class="maintenance-scheduling">
+            <h2>Schedule Maintenance</h2>
+            <form id="maintenanceForm">
+                <div class="form-group">
+                    <label for="assetId">Asset ID:</label>
+                    <input type="text" id="assetId" name="assetId" required>
+                </div>
+                <div class="form-group">
+                    <label for="maintenanceType">Maintenance Type:</label>
+                    <select id="maintenanceType" name="maintenanceType" required>
+                        <option value="Routine">Routine</option>
+                        <option value="Repair">Repair</option>
+                        <option value="Inspection">Inspection</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="scheduledDate">Scheduled Date:</label>
+                    <input type="date" id="scheduledDate" name="scheduledDate" required>
+                </div>
+                <div class="form-group">
+                    <label for="serviceProvider">Service Provider:</label>
+                    <input type="text" id="serviceProvider" name="serviceProvider">
+                </div>
+                <button type="submit">Schedule Maintenance</button>
+            </form>
+        </section>
+
+        <section class="scheduled-tasks">
+            <h2>Scheduled Maintenance Tasks</h2>
+            <table id="tasksTable">
+                <thead>
+                    <tr>
+                        <th>Asset ID</th>
+                        <th>Maintenance Type</th>
+                        <th>Scheduled Date</th>
+                        <th>Service Provider</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Dynamically filled -->
+                </tbody>
+            </table>
+        </section>
+
+        <section class="work-orders">
+            <h2>Work Orders</h2>
+            <form id="workOrderForm">
+                <div class="form-group">
+                    <label for="workOrderId">Work Order ID:</label>
+                    <input type="text" id="workOrderId" name="workOrderId" required>
+                </div>
+                <div class="form-group">
+                    <label for="assetIdWorkOrder">Asset ID:</label>
+                    <input type="text" id="assetIdWorkOrder" name="assetIdWorkOrder" required>
+                </div>
+                <div class="form-group">
+                    <label for="workDescription">Work Description:</label>
+                    <textarea id="workDescription" name="workDescription" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="assignedTo">Assigned To:</label>
+                    <input type="text" id="assignedTo" name="assignedTo" required>
+                </div>
+                <div class="form-group">
+                    <label for="status">Status:</label>
+                    <select id="status" name="status" required>
+                        <option value="Pending">Pending</option>
+                        <option value="In Progress">In Progress</option>
+                        <option value="Completed">Completed</option>
+                    </select>
+                </div>
+                <button type="submit">Create Work Order</button>
+            </form>
+
+            <table id="workOrdersTable">
+                <thead>
+                    <tr>
+                        <th>Work Order ID</th>
+                        <th>Asset ID</th>
+                        <th>Work Description</th>
+                        <th>Assigned To</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Dynamically filled -->
+                </tbody>
+            </table>
+        </section>
+    </main>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+    const maintenanceForm = document.getElementById('maintenanceForm');
+    const workOrderForm = document.getElementById('workOrderForm');
+    const tasksTableBody = document.getElementById('tasksTable').getElementsByTagName('tbody')[0];
+    const workOrdersTableBody = document.getElementById('workOrdersTable').getElementsByTagName('tbody')[0];
+
+    const maintenanceTasks = [];
+    const workOrders = [];
+
+    maintenanceForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const task = {
+            assetId: maintenanceForm.assetId.value,
+            maintenanceType: maintenanceForm.maintenanceType.value,
+            scheduledDate: maintenanceForm.scheduledDate.value,
+            serviceProvider: maintenanceForm.serviceProvider.value || 'N/A'
+        };
+        maintenanceTasks.push(task);
+        addTaskToTable(task);
+        maintenanceForm.reset();
+    });
+
+    workOrderForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const workOrder = {
+            workOrderId: workOrderForm.workOrderId.value,
+            assetId: workOrderForm.assetIdWorkOrder.value,
+            workDescription: workOrderForm.workDescription.value,
+            assignedTo: workOrderForm.assignedTo.value,
+            status: workOrderForm.status.value
+        };
+        workOrders.push(workOrder);
+        addWorkOrderToTable(workOrder);
+        workOrderForm.reset();
+    });
+
+    function addTaskToTable(task) {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${task.assetId}</td>
+            <td>${task.maintenanceType}</td>
+            <td>${task.scheduledDate}</td>
+            <td>${task.serviceProvider}</td>
+        `;
+        tasksTableBody.appendChild(row);
+    }
+
+    function addWorkOrderToTable(workOrder) {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${workOrder.workOrderId}</td>
+            <td>${workOrder.assetId}</td>
+            <td>${workOrder.workDescription}</td>
+            <td>${workOrder.assignedTo}</td>
+            <td>${workOrder.status}</td>
+        `;
+        workOrdersTableBody.appendChild(row);
+    }
+});
+
+    </script>
+</body>
+</html>

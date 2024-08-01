@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resource Request Form</title>
+    <style>
+        body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f9f9f9;
+}
+
+header {
+    background-color: #4CAF50;
+    color: white;
+    text-align: center;
+    padding: 1rem 0;
+}
+
+main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2rem;
+}
+
+form {
+    background-color: white;
+    padding: 2rem;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 600px;
+    border-radius: 5px;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: bold;
+}
+
+input, select, textarea {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+}
+
+textarea {
+    height: 100px;
+}
+
+button {
+    background-color: #4CAF50;
+    color: white;
+    padding: 0.75rem;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 1rem;
+}
+
+button:hover {
+    background-color: #45a049;
+}
+
+.hidden {
+    display: none;
+}
+
+#responseMessage {
+    margin-top: 1rem;
+    padding: 1rem;
+    border-radius: 3px;
+    width: 100%;
+    max-width: 600px;
+    text-align: center;
+}
+
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Resource Request Form</h1>
+    </header>
+    <main>
+        <form id="requestForm">
+            <div class="form-group">
+                <label for="requesterName">Requester Name</label>
+                <input type="text" id="requesterName" name="requesterName" required>
+            </div>
+            <div class="form-group">
+                <label for="department">Department</label>
+                <select id="department" name="department" required>
+                    <option value="">Select Department</option>
+                    <option value="IT">IT</option>
+                    <option value="HR">HR</option>
+                    <option value="Finance">Finance</option>
+                    <option value="Operations">Operations</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="resourceType">Resource Type</label>
+                <select id="resourceType" name="resourceType" required>
+                    <option value="">Select Resource Type</option>
+                    <option value="Equipment">Equipment</option>
+                    <option value="Furniture">Furniture</option>
+                    <option value="Supplies">Supplies</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="quantity">Quantity</label>
+                <input type="number" id="quantity" name="quantity" required min="1">
+            </div>
+            <div class="form-group">
+                <label for="justification">Justification for Request</label>
+                <textarea id="justification" name="justification" required></textarea>
+            </div>
+            <div class="form-group">
+                <label for="preferredDate">Preferred Date</label>
+                <input type="date" id="preferredDate" name="preferredDate" required>
+            </div>
+            <div class="form-group">
+                <button type="submit">Submit Request</button>
+            </div>
+        </form>
+        <div id="responseMessage" class="hidden"></div>
+    </main>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('requestForm');
+    const responseMessage = document.getElementById('responseMessage');
+
+    form.addEventListener('submit', function(event) {
+        event.preventDefault();
+        
+        // Gather form data
+        const formData = new FormData(form);
+        const data = {};
+        formData.forEach((value, key) => {
+            data[key] = value;
+        });
+
+        // Simulate form submission to server
+        setTimeout(() => {
+            // Mock server response
+            const success = true; // Simulate success or failure
+            if (success) {
+                responseMessage.textContent = 'Request submitted successfully!';
+                responseMessage.classList.add('success');
+                responseMessage.classList.remove('hidden', 'error');
+                form.reset();
+            } else {
+                responseMessage.textContent = 'There was an error submitting your request. Please try again.';
+                responseMessage.classList.add('error');
+                responseMessage.classList.remove('hidden', 'success');
+            }
+        }, 1000);
+    });
+});
+
+    </script>
+</body>
+</html>
