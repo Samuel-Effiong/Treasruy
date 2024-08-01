@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pending Requests</title>
+    <style>
+        body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f9f9f9;
+}
+
+header {
+    background-color: #4CAF50;
+    color: white;
+    text-align: center;
+    padding: 1rem 0;
+}
+
+main {
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+section {
+    background-color: white;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 5px;
+    padding: 1rem;
+    margin: 1rem;
+    width: 100%;
+    max-width: 1200px;
+}
+
+h2 {
+    margin-top: 0;
+    font-size: 1.5rem;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+}
+
+th, td {
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+th {
+    background-color: #f2f2f2;
+}
+
+tr:hover {
+    background-color: #f1f1f1;
+}
+
+button {
+    background-color: #4CAF50;
+    color: white;
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 1rem;
+    margin-right: 0.5rem;
+}
+
+button.reject {
+    background-color: #f44336;
+}
+
+button:hover {
+    opacity: 0.8;
+}
+
+/* Modal Styles */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgb(0,0,0);
+    background-color: rgba(0,0,0,0.4);
+    padding-top: 60px;
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: 5% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    max-width: 600px;
+    border-radius: 5px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+}
+
+.close-button {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close-button:hover,
+.close-button:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Pending Requests</h1>
+    </header>
+    <main>
+        <section class="pending-requests">
+            <h2>Pending Requests</h2>
+            <table id="requestsTable">
+                <thead>
+                    <tr>
+                        <th>Request ID</th>
+                        <th>Asset ID</th>
+                        <th>Requested By</th>
+                        <th>Request Date</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Dynamically filled -->
+                </tbody>
+            </table>
+        </section>
+    </main>
+
+    <!-- Modal Dialog -->
+    <div id="requestModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h2>Request Details</h2>
+            <p><strong>Request ID:</strong> <span id="modalRequestId"></span></p>
+            <p><strong>Asset ID:</strong> <span id="modalAssetId"></span></p>
+            <p><strong>Requested By:</strong> <span id="modalRequestedBy"></span></p>
+            <p><strong>Request Date:</strong> <span id="modalRequestDate"></span></p>
+            <p><strong>Status:</strong> <span id="modalStatus"></span></p>
+            <button id="approveBtn" class="approve">Approve</button>
+            <button id="rejectBtn" class="reject">Reject</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+    const requestsTableBody = document.getElementById('requestsTable').getElementsByTagName('tbody')[0];
+    const requestModal = document.getElementById('requestModal');
+    const closeButton = document.querySelector('.close-button');
+    const approveBtn = document.getElementById('approveBtn');
+    const rejectBtn = document.getElementById('rejectBtn');
+    
+    const modalRequestId = document.getElementById('modalRequestId');
+    const modalAssetId = document.getElementById('modalAssetId');
+    const modalRequestedBy = document.getElementById('modalRequestedBy');
+    const modalRequestDate = document.getElementById('modalRequestDate');
+    const modalStatus = document.getElementById('modalStatus');
+
+    const pendingRequests = [
+        { requestId: 'REQ001', assetId: 'ASSET001', requestedBy: 'John Doe', requestDate: '2024-07-01', status: 'Pending' },
+        { requestId: 'REQ002', assetId: 'ASSET002', requestedBy: 'Jane Smith', requestDate: '2024-07-02', status: 'Pending' },
+        { requestId: 'REQ003', assetId: 'ASSET003', requestedBy: 'Bob Johnson', requestDate: '2024-07-03', status: 'Pending' }
+    ];
+
+    function loadPendingRequests() {
+        requestsTableBody.innerHTML = '';
+        pendingRequests.forEach(request => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${request.requestId}</td>
+                <td>${request.assetId}</td>
+                <td>${request.requestedBy}</td>
+                <td>${request.requestDate}</td>
+                <td>${request.status}</td>
+                <td>
+                    <button class="view-details" onclick="openModal('${request.requestId}')">View Details</button>
+                </td>
+            `;
+            requestsTableBody.appendChild(row);
+        });
+    }
+
+    window.openModal = function(requestId) {
+        const request = pendingRequests.find(req => req.requestId === requestId);
+        if (request) {
+            modalRequestId.textContent = request.requestId;
+            modalAssetId.textContent = request.assetId;
+            modalRequestedBy.textContent = request.requestedBy;
+            modalRequestDate.textContent = request.requestDate;
+            modalStatus.textContent = request.status;
+            requestModal.style.display = 'block';
+        }
+    }
+
+    closeButton.addEventListener('click', function() {
+        requestModal.style.display = 'none';
+    });
+
+    window.onclick = function(event) {
+        if (event.target === requestModal) {
+            requestModal.style.display = 'none';
+        }
+    };
+
+    approveBtn.addEventListener('click', function() {
+        updateRequestStatus(modalRequestId.textContent, 'Approved');
+        requestModal.style.display = 'none';
+    });
+
+    rejectBtn.addEventListener('click', function() {
+        updateRequestStatus(modalRequestId.textContent, 'Rejected');
+        requestModal.style.display = 'none';
+    });
+
+    function updateRequestStatus(requestId, status) {
+        const request = pendingRequests.find(req => req.requestId === requestId);
+        if (request) {
+            request.status = status;
+            loadPendingRequests();
+        }
+    }
+
+    loadPendingRequests();
+});
+
+    </script>
+</body>
+</html>
